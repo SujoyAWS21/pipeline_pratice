@@ -1,28 +1,20 @@
 pipeline {
     agent any
     parameters {
-        string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
-
-        text(name: 'BIOGRAPHY', defaultValue: '', description: 'Enter some information about the person')
-
-        booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
-
-        choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
-
-        password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
+       choice(choices: ['dev', 'qa'], description: 'What environment?', name: 'env')
+        
+       choice(choices: ['US-EAST-1', 'US-WEST-2'], description: 'What AWS region?', name: 'region')
+        
+       string(defaultValue: '', description: 'Which sysid?', name: 'sysid', trim: true)
     }
     stages {
         stage('Example') {
             steps {
-                echo "Hello ${params.PERSON}"
+                echo "Environment: ${params.env}"
 
-                echo "Biography: ${params.BIOGRAPHY}"
+                echo "Region: ${params.region}"
 
-                echo "Toggle: ${params.TOGGLE}"
-
-                echo "Choice: ${params.CHOICE}"
-
-                echo "Password: ${params.PASSWORD}"
+                echo "SYS ID: ${params.sysid}"
             }
         }
     }
