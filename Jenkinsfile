@@ -10,6 +10,8 @@ pipeline {
     stages {
         stage('Example') {
             steps {
+
+                build job: 'demojob', parameters: [[$class: 'StringParameterValue', name: 'env', value: '${params.env}'], [$class: 'StringParameterValue', name: 'region', value: '${params.region}'], [$class: 'StringParameterValue', name: 'sysid', value: '${params.sysid}']], wait: true
                 echo "Environment: ${params.env}"
 
                 echo "Region: ${params.region}"
