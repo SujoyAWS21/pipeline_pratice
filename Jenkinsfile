@@ -1,25 +1,64 @@
 pipeline {
     agent any
-    parameters {
-       choice(choices: ['dev', 'qa'], description: 'What environment?', name: 'env')
-        
-       choice(choices: ['US-EAST-1', 'US-WEST-2'], description: 'What AWS region?', name: 'region')
-        
-       string(defaultValue: '', description: 'Which sysid?', name: 'sysid', trim: true)
-       
-       string(defaultValue: '', description: 'What time?', name: 'schedule', trim: true)
-    }
-    stages {
-        stage('Example') {
-            steps {
-
-                build job: 'demojob', parameters: [[$class: 'StringParameterValue', name: 'env', value: "${params.env}"], [$class: 'StringParameterValue', name: 'region', value: "${params.region}"], [$class: 'StringParameterValue', name: 'sysid', value: "${params.sysid}"], [$class: 'StringParameterValue', name: 'schedule', value: "${params.schedule}"]], wait: true
-                echo "Environment: ${params.env}"
-
-                echo "Region: ${params.region}"
-
-                echo "SYS ID: ${params.sysid}"
+        stages {
+            stage('Parameters'){
+                steps {
+                    script {
+                    properties([
+                            parameters([
+                                [$class: 'ChoiceParameter', 
+                                    choiceType: 'PT_SINGLE_SELECT', 
+                                    description: 'Select the Environemnt from the Dropdown List', 
+                                    filterLength: 1, 
+                                    filterable: false, 
+                                    name: 'env', 
+                                    script: [
+                                        $class: 'GroovyScript', 
+                                        fallbackScript: [
+                                            classpath: [], 
+                                            sandbox: false, 
+                                            script: 
+                                                "return['Could not get The environemnts']"
+                                        ], 
+                                        script: [
+                                            classpath: [], 
+                                            sandbox: false, 
+                                            script: 
+                                                "return['dev','qa']"
+                                        ]
+                                    ]
+                                ],
+                                [$class: 'CascadeChoiceParameter', 
+                                    choiceType: 'PT_SINGLE_SELECT', 
+                                    description: 'Select the Accounts from the Dropdown List',
+                                    name: 'Account List', 
+                                    referencedParameters: 'env', 
+                                    script: 
+                                        [$class: 'GroovyScript', 
+                                        fallbackScript: [
+                                                classpath: [], 
+                                                sandbox: false, 
+                                                script: "return['Could not get Environment from Env Param']"
+                                                ], 
+                                        script: [
+                                                classpath: [], 
+                                                sandbox: false, 
+                                                script: '''
+                                                if (Env.equals("dev")){
+                                                    return["12345", "23456", "34567"]
+                                                }
+                                                else if(Env.equals("qa")){
+                                                    return["4536546", "6676475", "8797790"]
+                                                }
+                                                '''
+                                            ] 
+                                    ]
+                                ],
+                            
+                            ])
+                        ])
+                    }
+                }
             }
-        }
-    }
+        }   
 }
